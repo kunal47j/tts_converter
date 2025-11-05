@@ -4,12 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Text to Speech Converter</title>
+    <!-- Use a clean system font stack with a friendly web font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
 </head>
 <body>
     <div class="bg-animated"></div>
+
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="logo">TTS Converter</div>
+            <div class="tag">Fast • Simple • Accessible</div>
+        </div>
+    </header>
+
     <div class="container">
         <h1 class="heading-animate">Text to Speech Converter</h1>
+        <p class="subtitle">Paste text, choose a voice & speed, then convert. Works across devices.</p>
         <form id="ttsForm">
             <div class="form-floating">
                 <textarea name="text" id="text" rows="5" placeholder=" " required></textarea>
@@ -27,9 +38,14 @@
             <label for="rate">Speed (default 200):</label>
             <input type="number" id="rate" name="rate" value="200" min="50" max="400" />
 
-            <button type="submit">Convert to Speech</button>
+            <button type="submit" id="convertBtn">
+                <span class="btn-text">Convert to Speech</span>
+                <span class="btn-spinner" aria-hidden="true"></span>
+            </button>
         </form>
         <audio id="audioPlayer" controls style="width: 100%; margin-top: 15px; display:none;"></audio>
+        <a id="downloadLink" class="download-btn" style="display:none;">Download audio</a>
+        <div id="statusRegion" aria-live="polite" class="sr-only"></div>
     </div>
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </body>
