@@ -1,0 +1,17 @@
+# Ignore virtual environment
+venv/
+
+# Ignore audio output files starting with output_
+output_*.mp3
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Ignore environment and log files
+.env
+*.log
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db

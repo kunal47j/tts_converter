@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Text to Speech Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" />
+</head>
+<body>
+    <div class="bg-animated"></div>
+    <div class="container">
+        <h1 class="heading-animate">Text to Speech Converter</h1>
+        <form id="ttsForm">
+            <div class="form-floating">
+                <textarea name="text" id="text" rows="5" placeholder=" " required></textarea>
+                <label for="text">Enter your text here...</label>
+            </div>
+
+            <label for="voice_id">Voice:</label>
+            <select name="voice_id" id="voice_id">
+                <option value="">Default</option>
+                <option value="0">Voice 0</option>
+                <option value="1">Voice 1</option>
+                <!-- Add more if needed -->
+            </select>
+
+            <label for="rate">Speed (default 200):</label>
+            <input type="number" id="rate" name="rate" value="200" min="50" max="400" />
+
+            <button type="submit">Convert to Speech</button>
+        </form>
+        <audio id="audioPlayer" controls style="width: 100%; margin-top: 15px; display:none;"></audio>
+    </div>
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</body>
+</html>
