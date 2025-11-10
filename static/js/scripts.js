@@ -1,10 +1,35 @@
+// Update slider value display
+document.getElementById('rate').addEventListener('input', function() {
+    document.getElementById('rateValue').textContent = this.value;
+});
+
+// Update character count
+document.getElementById('text').addEventListener('input', function() {
+    document.getElementById('charCount').textContent = this.value.length;
+});
+
 function showSuccess(message) {
+    // Remove any existing messages
+    document.querySelectorAll('.success-msg').forEach(el => el.remove());
+    
     let msgDiv = document.createElement('div');
     msgDiv.textContent = message;
     msgDiv.className = "success-msg";
     document.body.appendChild(msgDiv);
     setTimeout(() => { msgDiv.classList.add('fadeout'); }, 1800);
     setTimeout(() => { msgDiv.remove(); }, 3000);
+}
+
+function showError(message) {
+    // Remove any existing messages
+    document.querySelectorAll('.error-msg').forEach(el => el.remove());
+    
+    let msgDiv = document.createElement('div');
+    msgDiv.textContent = message;
+    msgDiv.className = 'error-msg';
+    document.body.appendChild(msgDiv);
+    setTimeout(() => { msgDiv.classList.add('fadeout'); }, 2400);
+    setTimeout(() => { msgDiv.remove(); }, 3600);
 }
 
 document.getElementById('ttsForm').addEventListener('submit', function(e) {
@@ -22,33 +47,43 @@ document.getElementById('ttsForm').addEventListener('submit', function(e) {
     convertBtn.classList.add('btn-loading');
     btnText.textContent = 'Converting...';
     statusRegion.textContent = 'Converting text to speech. Please wait.';
+    
+    // Show loading state for audio player
+    audioPlayer.style.display = 'none';
 
     fetch('/tts', {
         method: 'POST',
         body: formData
     })
     .then(response => {
-        if (!response.ok) throw new Error('Network response was not ok');
+        if (!response.ok) {
+            return response.text().then(text => { throw new Error(text || 'Network response was not ok'); });
+        }
         return response.blob();
     })
     .then(blob => {
         const audioURL = URL.createObjectURL(blob);
         audioPlayer.src = audioURL;
         audioPlayer.style.display = 'block';
-        audioPlayer.play().catch(()=>{});
+        
+        // Play audio automatically
+        audioPlayer.play().catch(error => {
+            console.warn('Auto-play prevented:', error);
+            showSuccess('Conversion complete! Click play to listen.');
+        });
 
-        // enable download
-        const filename = 'speech.mp3';
-        const url = audioURL;
-        downloadLink.href = url;
+        // Enable download
+        const filename = 'speech-' + new Date().getTime() + '.mp3';
+        downloadLink.href = audioURL;
         downloadLink.download = filename;
         downloadLink.style.display = 'inline-block';
+        downloadLink.textContent = 'Download audio (' + formatFileSize(blob.size) + ')';
 
-        showSuccess('Conversion complete — playing audio.');
+        showSuccess('Conversion successful! Playing audio...');
     })
     .catch(error => {
-        showError('Error converting text to speech.');
-        console.error(error);
+        console.error('Error:', error);
+        showError('Error: ' + (error.message || 'Failed to convert text to speech.'));
     })
     .finally(() => {
         convertBtn.disabled = false;
@@ -58,14 +93,11 @@ document.getElementById('ttsForm').addEventListener('submit', function(e) {
     });
 });
 
-function showError(message) {
-    let msgDiv = document.createElement('div');
-    msgDiv.textContent = message;
-    msgDiv.className = 'success-msg';
-    msgDiv.style.background = '#e13b3b';
-    msgDiv.style.boxShadow = '0 6px 20px rgba(225,59,59,0.2)';
-    document.body.appendChild(msgDiv);
-    setTimeout(() => { msgDiv.classList.add('fadeout'); }, 2400);
-    setTimeout(() => { msgDiv.remove(); }, 3600);
+// Helper function to format file size
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
-
